@@ -2,7 +2,8 @@ package main
 
 import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"gowallet/mypxc"
+	"gowallet3/mypxc"
+	//"coindemo/mypxc"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -14,8 +15,17 @@ import (
 	"log"
 )
 
+// 密钥
 const KEYDIR = "/Users/Weelin/private_ent/eth01/node1/keystore/"
+
+// 账户密码
 const SECRET = "abcdef"
+
+// 合约部署后的地址
+const CDDR = "0x6eb5E517a6D0Ea77664168C456ccd91574809D26"
+
+const URL = "/Users/Weelin/private_ent/eth01/node1/geth.ipc"
+const URL1 = "http://localhost:8545"
 
 var (
 	owner   string = "0x740eec88db4e2fb8cc50eae456d108775aa3a33f"
@@ -25,11 +35,6 @@ var (
 	u4      string = "0x5ab6a67381a913fd071bd477148aed23b3c02c7a"
 	session *mypxc.PxcSession
 )
-
-const CDDR = "0x38D2ab30612700e28eac03d7CC31fAd2156ee274"
-const CDDR1 = "0x8A866d2A4558e36506A18192B6BBC597778E5f14"
-const URL = "/Users/Weelin/private_ent/eth01/node1/geth.ipc"
-const URL1 = "http://localhost:8545"
 
 func init() {
 	cli, err := GetCli(URL)
@@ -65,6 +70,8 @@ func init() {
 			//GasLimit: 3141592,
 		},
 	}
+	// 代币名称
+	//fmt.Println(session.Name())
 }
 
 /**
@@ -81,14 +88,13 @@ func GetKeyFile(addr, keydir string) (string, error) {
 	return "", err
 }
 
-
 /**
 打印交易信息
  */
 func printTx(tx *types.Transaction, params ...interface{}) {
-	if len(params)>0{
+	if len(params) > 0 {
 		fmt.Printf("transfer pending,交易信息如下:\n执行合约: %s, 交易hash: %s, 花费(wei):%d, gas数量:%d, gas单价:%d,nonce:%d, value(amount): %d \n", tx.To(), tx.Hash().Hex(), tx.Cost().Uint64(), tx.Gas(), tx.GasPrice().Uint64(), tx.Nonce(), tx.Value())
-	}else{
+	} else {
 		fmt.Printf("transfer pending,交易信息如下:\n执行合约: %s, 交易hash: %s, 花费(wei):%d, gas数量:%d, gas单价:%d,nonce:%d, value(amount): %d \n", tx.To().Hex(), tx.Hash().Hex(), tx.Cost().Uint64(), tx.Gas(), tx.GasPrice().Uint64(), tx.Nonce(), tx.Value())
 	}
 }
@@ -123,12 +129,11 @@ func deployContract(deployAddr, passwd string, params ...interface{}) (common.Ad
 		return common.Address{}, nil, nil, err
 	}
 	defer backend.Close()
-	addr, tx, pxc, _ := mypxc.DeployPxc(auth, backend, big.NewInt(10000000000), common.HexToAddress(deployAddr))
+	addr, tx, pxc, _ := mypxc.DeployPxc(auth, backend, big.NewInt(20000000000), common.HexToAddress(deployAddr))
 	log.Println("合约地址: ", addr.Hex())
 	printTx(tx, "deploy contract")
 	return addr, tx, pxc, nil
 }
-
 
 /**
 获取总的币的数量(可以使用session实现)
@@ -149,7 +154,6 @@ func getTotalSupply(contractAddr string) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	fmt.Printf("合约 %s, totalSupply: %d\n", contractAddr, total.Int64())
 	return total.Int64(), nil
 
 	// session实现
@@ -196,7 +200,7 @@ func Transfer(contractAddr, ownerAddr, fromPass, toAddr string, count int64) (tx
 	tcount := big.NewInt(count)
 	cAddr := common.HexToAddress(contractAddr)
 	defer func() {
-		if err!=nil{
+		if err != nil {
 			log.Fatalf("Failed to transfer from %s to %s, because %v", owner, toAddr, err)
 		}
 	}()
@@ -283,8 +287,8 @@ func approveToSpenderCount(contractAddr, ownerAddr, ownerPass, spenderAddr strin
 	sAddr := common.HexToAddress(spenderAddr)
 	scount := big.NewInt(count)
 	defer func() {
-		if err !=nil{
-			log.Fatalf("Failed when owner: %s approve spender: %s count: %d\n, because %v", ownerAddr, spenderAddr, count, err )
+		if err != nil {
+			log.Fatalf("Failed when owner: %s approve spender: %s count: %d\n, because %v", ownerAddr, spenderAddr, count, err)
 		}
 	}()
 	cli, err := GetCli(URL)
@@ -364,9 +368,16 @@ func showBalanceOfAccounts(contractAddr string) {
 
 func main() {
 	showBalanceOfAccounts(CDDR)
-
 	// u1-->u3, 使用 &mypxc.PxcSession
-	//tx, err := session.Transfer(common.HexToAddress(u4), big.NewInt(1000))
+	//tx, err := session.Transfer(common.HexToAddress(u3), big.NewInt(3000))
+	//if err != nil {
+	//	panic(err)
+	//}
+	//printTx(tx)
+	//
+	//lastNonce:=tx.Nonce()
+	//session.TransactOpts.Nonce = big.NewInt(int64(lastNonce+1))
+	//tx, err = session.Transfer(common.HexToAddress(u2), big.NewInt(3000))
 	//if err != nil {
 	//	panic(err)
 	//}
@@ -379,14 +390,13 @@ func main() {
 	//}
 	//printTx(tx)
 
-
-	// u3向u1授权200的量
+	//u3向u1授权300的量
 	//tx, err:=approveToSpenderCount(CDDR, u3, SECRET, u1, 300)
 	//if err!=nil{
 	//	panic(err)
 	//}
 	//printTx(tx)
-
+	//
 	// 获取u3向u1的授权量
 	//allowCount, err:=getallowanceOfAToB(CDDR, u3, u1)
 	//if err!=nil{
@@ -395,9 +405,8 @@ func main() {
 	//	fmt.Println(allowCount)
 	//}
 
-
-	// A transfer B's token to C TODO: 解决Approval成后,第三方仍不能通过TransferFrom 转账
-	//tx, err := TransferFromTo(CDDR, u1, SECRET, u3, u4, 300)
+	// A transfer B's token to C
+	//tx, err := TransferFromTo(CDDR, u1, SECRET, u3, u4, 200)
 	//if err != nil {
 	// panic(err)
 	//}
