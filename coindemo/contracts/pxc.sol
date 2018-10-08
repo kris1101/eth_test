@@ -36,36 +36,31 @@ contract pdjtoken is ERC20 {
             balances[_to] + _value > balances[_to] ) {
             balances[_to] += _value;
             balances[msg.sender] -= _value;
-            emit Transfer(msg.sender, _to, _value);
-            return true;
         } else {
-            return false;
+            throw;
         }
     }
     function transferFrom(address _from, address _to, uint _value) returns (bool success) {
-        if( allowed[_from][_to] >= _value && 
+        if( allowed[_from][msg.sender] >= _value && 
             _value >0 &&
             balances[_to] + _value > balances[_to] 
         ) {
             balances[_to] += _value;
             balances[_from] -= _value;
-            allowed[_from][_to] -= _value;
-            emit Transfer(_from, _to, _value);
-            return true;
+            allowed[_from][msg.sender] -= _value;
         } else {
-            return false;
+            throw;
         }
     }
+    
     function approve(address _spender, uint _value) returns (bool success) {
         if( balances[msg.sender] >= _value &&
             _value > 0 &&
             allowed[msg.sender][_spender] + _value > 0 
         ) {
             allowed[msg.sender][_spender] = _value;
-            emit Approval(msg.sender, _spender, _value);
-            return true;
         } else {
-            return false;
+            throw;
         }
     }
     function allowance(address _owner, address _spender) constant returns (uint remaining) {
