@@ -20,12 +20,14 @@ fs.writeFile('Voting.json',JSON.stringify(abiDefinition), {}, function(err) {
 
 let VotingContract = web3.eth.contract(abiDefinition);
 let byteCode = '0x' + compiledCode.contracts[':Voting'].bytecode;
-console.log(byteCode);
+
 //调用VotingContract对象的new()方法来将投票合约部署到区块链。new()方法参数列表应当与合约的 构造函数要求相一致。对于投票合约而言，new()方法的第一个参数是候选人名单。
 let deployedContract = VotingContract.new(['Rama','Nick','Jose'],{data: byteCode, from: web3.eth.accounts[0], gas: 4700000});
+console.log('deploy complete,deploy address is '+ deployedContract.address);
 
-let contractInstance = VotingContract.at('0x99bdfb1f4c5d0c227d6cd98cf7a254bfc27c35cc');
+let contractInstance = VotingContract.at('0xC9D4D622936BeaDc39Fbf38cc1c2E866875D226A');
 
+contractInstance.voteForCandidate('Rama', {from: web3.eth.accounts[0]});
 contractInstance.voteForCandidate('Rama', {from: web3.eth.accounts[0]});
 contractInstance.voteForCandidate('Nick', {from: web3.eth.accounts[0]});
 contractInstance.voteForCandidate('Jose', {from: web3.eth.accounts[0]});
