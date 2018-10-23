@@ -1,7 +1,6 @@
 {
   "name": "voooooote",
   "version": "1.0.0",
-  "description": "",
   "main": "depoy.js",
   "dependencies": {
     "express": "^4.16.4",
@@ -14,5 +13,6 @@
   },
   "keywords": [],
   "author": "Yanwei",
-  "license": "ISC"
+  "license": "ISC",
+  "description": ""
 }
