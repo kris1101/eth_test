@@ -25,7 +25,6 @@ app.get("/totalVotesFor", function(req, res) {
 	var voteName = req.query.voteName;
 	var vote_num = contractInstance.totalVotesFor.call(voteName).toString();
 	console.log(vote_num);
-	console.log(req);
 	res.send(vote_num);
 });
 
